@@ -4,6 +4,7 @@ from datasets import load_dataset
 sys.path.append('/Users/macbookpro/Desktop/BaseInternship')
 
 from Tokenizer.Basic_Tokenizer import basic_tokenizer
+
 class TrainTokenizer:
     def __init__(self, vocab_size):
         self.dataset = load_dataset("json", data_files="/Users/macbookpro/Desktop/BaseInternship/oscar-2019-my-fix.json", split="train")
