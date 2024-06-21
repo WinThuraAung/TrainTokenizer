@@ -1,15 +1,21 @@
 import pandas as pd
-from Tokenizer.Basic_Tokenizer import basic_tokenizer
 from huggingface_hub import HfApi
 from datasets import load_dataset
-from TrainTokenizer import TrainTokenizer
+import dask.dataframe as dd
+
+from Tokenizer.Tokenizer import Tokenizer
+
+from traintokenizercode import Train_Tokenizer
+
 
 dataset_url = "https://huggingface.co/spaces/5w4n/burmese-tokenizers/blob/main/dataset.csv"
-df = pd.read_csv(dataset_url)
+# df = pd.read_csv(dataset_url)
+df = dd.read_csv(dataset_url)
 
-tokenizer = TrainTokenizer(300)
+tokenizer = Train_Tokenizer(300)
 tokenizer.concatenateString()
 tokenizer.train()
+
 
 
 df['tokenized_text'] = df['text'].apply(tokenizer.encode)
