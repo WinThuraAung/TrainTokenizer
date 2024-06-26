@@ -1,10 +1,13 @@
-import pandas as pd
-from huggingface_hub import HfApi
-from datasets import load_dataset
 import dask.dataframe as dd
+from dask.diagnostics import ProgressBar
+from huggingface_hub import HfApi
+import os
+import sys
 
-from Tokenizer.Tokenizer import Tokenizer
+# Add the parent directory to the system path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from TokenizerFolder.TokenizerFile import Tokenizer
 from traintokenizercode import Train_Tokenizer
 
 
@@ -16,13 +19,15 @@ tokenizer = Train_Tokenizer(300)
 tokenizer.concatenateString()
 tokenizer.train()
 
+def tokenize_text(text):
+    return tokenizer.encode(text)
 
-
-df['tokenized_text'] = df['text'].apply(tokenizer.encode)
+df['tokenized_text'] = df['text'].map(tokenize_text, meta=('text', 'object'))
 
 # Save the new DataFrame to a CSV file
 output_path = "processed_dataset.csv"
-df.to_csv(output_path, index=False)
+with ProgressBar():
+    df.to_csv(output_path, index=False, single_file=True)
 
 # Push to Huggingface
 api = HfApi()
