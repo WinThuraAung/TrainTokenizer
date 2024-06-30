@@ -1,39 +1,64 @@
-import sys
-from datasets import load_dataset
+import sentencepiece as spm
+import os
+import json
+from transformers import PreTrainedTokenizerFast
 
-sys.path.append('/Users/macbookpro/Desktop/BaseInternship')
+input_json_path = "oscar-2019-my-fix.json"
+output_text_path = "oscar-2019-my-fix.txt"
 
-from TokenizerFolder.basictokenizerfile import basic_tokenizer
 
-class Train_Tokenizer:
-    def __init__(self, vocab_size):
-        self.dataset = load_dataset("json", data_files="/Users/macbookpro/Desktop/BaseInternship/oscar-2019-my-fix.json", split="train")
-        self.trainer = basic_tokenizer()
-        self.vocab_size = vocab_size
-        self.text = ""
+with open(input_json_path, 'r', encoding='utf-8') as json_file:
+    with open(output_text_path, 'w', encoding='utf-8') as text_file:
+        for line in json_file:
+            data = json.loads(line)
+            text_file.write(data['text'] + '\n')  
 
-    def concatenateString(self):
-        count = 1
-        for doc in self.dataset:
-            print(count)
-            count += 1
-            text = doc['text']
-            self.text += text + "\n"
+# Options for training the SentencePiece model
+options = dict(
+    input="oscar-2019-my-fix.txt",
+    input_format="text",
+    model_prefix="trained_byte",
+    model_type="bpe",
+    vocab_size=2000,
+    normalization_rule_name="identity",
+    remove_extra_whitespaces=False,
+    input_sentence_size=200000000,
+    max_sentence_length=4192,
+    seed_sentencepiece_size=1000000,
+    shuffle_input_sentence=True,
+    character_coverage=0.99995,
+    byte_fallback=True,
+    split_digits=True,
+    split_by_unicode_script=True,
+    split_by_whitespace=True,
+    split_by_number=True,
+    max_sentencepiece_length=16,
+    add_dummy_prefix=True,
+    allow_whitespace_only_pieces=True,
+    unk_id=0,
+    bos_id=1,
+    eos_id=2,
+    pad_id=-1,
+    num_threads=os.cpu_count(),
+)
 
-    def getText(self):
-        return self.text
+# Train the SentencePiece model
+spm.SentencePieceTrainer.train(**options)
+print("Done")
 
-    def train(self):
-        self.trainer.train(self.text, 300)
-    
-    def num_of_tokens(self, word):
-        return len(self.encode(word))
-    
-    def encode(self, word):
-        return self.trainer.encode(word)
+tokenizer = PreTrainedTokenizerFast(tokenizer_file="trained_byte.model")
 
-TrainTokenizer = Train_Tokenizer(300)
-TrainTokenizer.concatenateString()
-test_phrase = "မင်္ဂလာပါ"
-print(f"Encoded phrase: {TrainTokenizer.encode(test_phrase)}")
-print(f"Number of tokens: {TrainTokenizer.num_of_tokens(test_phrase)}")
+# Save the tokenizer
+tokenizer.save_pretrained("trained_tokenizer")
+
+# Load the tokenizer
+loaded_tokenizer = PreTrainedTokenizerFast.from_pretrained("trained_tokenizer")
+
+# Check tokenizer's performance
+example_string = "မင်္ဂလာပါ"
+tokens = loaded_tokenizer.tokenize(example_string)
+
+print(f"Example string: {example_string}")
+print(f"Number of tokens: {len(tokens)}")
+print(f"Tokens: {tokens}")
+

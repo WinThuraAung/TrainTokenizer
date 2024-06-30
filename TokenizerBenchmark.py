@@ -1,39 +1,19 @@
-import dask.dataframe as dd
-from dask.diagnostics import ProgressBar
-from huggingface_hub import HfApi
-import os
-import sys
+import pandas as pd
+from transformers import PreTrainedTokenizerFast
 
-# Add the parent directory to the system path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+csv_file = "https://huggingface.co/spaces/5w4n/burmese-tokenizers/raw/main/dataset.csv"
+df = pd.read_csv(csv_file)
 
-from TokenizerFolder.TokenizerFile import Tokenizer
-from traintokenizercode import Train_Tokenizer
-
-
-dataset_url = "https://huggingface.co/spaces/5w4n/burmese-tokenizers/blob/main/dataset.csv"
-# df = pd.read_csv(dataset_url)
-df = dd.read_csv(dataset_url)
-
-tokenizer = Train_Tokenizer(300)
-tokenizer.concatenateString()
-tokenizer.train()
+tokenizer = "trained_byte.model"
+tokenizer = PreTrainedTokenizerFast.from_pretrained(tokenizer)
 
 def tokenize_text(text):
-    return tokenizer.encode(text)
+    tokens = tokenizer.tokenize(text)
+    return tokens
 
-df['tokenized_text'] = df['text'].map(tokenize_text, meta=('text', 'object'))
+df['tokenized_text'] = df['text'].apply(tokenize_text)
 
-# Save the new DataFrame to a CSV file
-output_path = "processed_dataset.csv"
-with ProgressBar():
-    df.to_csv(output_path, index=False, single_file=True)
+output_csv_file = "updated_dataset.csv"
+df.to_csv(output_csv_file, index=False)
 
-# Push to Huggingface
-api = HfApi()
-api.upload_file(
-    path_or_fileobj=output_path,
-    path_in_repo="processed_dataset.csv",
-    repo_id="RonaldAung/processed_dataset",
-    repo_type="dataset"
-)
+print("Tokenization complete. Updated CSV saved to:", output_csv_file)
