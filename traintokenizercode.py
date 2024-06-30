@@ -46,7 +46,7 @@ options = dict(
 spm.SentencePieceTrainer.train(**options)
 print("Done")
 
-tokenizer = PreTrainedTokenizerFast(tokenizer_file="trained_byte.model")
+tokenizer = PreTrainedTokenizerFast(tokenizer_file="/Users/macbookpro/Desktop/BaseInternship/trained_byte.model")
 
 # Save the tokenizer
 tokenizer.save_pretrained("trained_tokenizer")
