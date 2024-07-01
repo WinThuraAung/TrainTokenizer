@@ -14,7 +14,7 @@ def tokenize_text(text):
 df['trained_byte'] = df['text'].apply(tokenize_text)
 
 
-output_csv_file = "updated_dataset.csv"
+output_csv_file = "TrainTokenizer/updated_dataset.csv"
 df.to_csv(output_csv_file, index=False)
 
 print("Tokenization complete. Updated CSV saved to:", output_csv_file)
