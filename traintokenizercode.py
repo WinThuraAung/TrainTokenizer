@@ -46,19 +46,4 @@ options = dict(
 spm.SentencePieceTrainer.train(**options)
 print("Done")
 
-tokenizer = PreTrainedTokenizerFast(tokenizer_file="/Users/macbookpro/Desktop/BaseInternship/trained_byte.model")
-
-# Save the tokenizer
-tokenizer.save_pretrained("trained_tokenizer")
-
-# Load the tokenizer
-loaded_tokenizer = PreTrainedTokenizerFast.from_pretrained("trained_tokenizer")
-
-# Check tokenizer's performance
-example_string = "မင်္ဂလာပါ"
-tokens = loaded_tokenizer.tokenize(example_string)
-
-print(f"Example string: {example_string}")
-print(f"Number of tokens: {len(tokens)}")
-print(f"Tokens: {tokens}")
 

@@ -14,6 +14,8 @@ try:
 except Exception as e:
     print(f"Error loading model with SentencePiece: {e}")
 
+print(sp.encode_as_pieces("ကျေးဇူးပြုပြီး မီး ပိတ် ပေးပါ"))
+
 
 # tokenizer = PreTrainedTokenizerFast(tokenizer_file="/Users/macbookpro/Desktop/BaseInternship/trained_byte.model")
 
